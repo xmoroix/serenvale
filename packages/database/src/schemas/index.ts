@@ -11,6 +11,7 @@ export * from './nextauth';
 export * from './oidc';
 export * from './rag';
 export * from './ragEvals';
+export * from './radiology';
 export * from './rbac';
 export * from './relations';
 export * from './session';

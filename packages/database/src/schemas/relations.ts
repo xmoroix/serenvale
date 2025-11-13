@@ -11,6 +11,7 @@ import { files, knowledgeBases } from './file';
 import { generationBatches, generationTopics, generations } from './generation';
 import { messageGroups, messages, messagesFiles } from './message';
 import { chunks, unstructuredChunks } from './rag';
+import { reports, studies } from './radiology';
 import { sessionGroups, sessions } from './session';
 import { threads, topicDocuments, topics } from './topic';
 import { users } from './user';
@@ -328,4 +329,29 @@ export const messageGroupsRelations = relations(messageGroups, ({ many, one }) =
   }),
   childGroups: many(messageGroups),
   messages: many(messages),
+}));
+
+// Radiology Studies Relations
+export const studiesRelations = relations(studies, ({ one, many }) => ({
+  user: one(users, {
+    fields: [studies.userId],
+    references: [users.id],
+  }),
+  reports: many(reports),
+}));
+
+// Radiology Reports Relations
+export const reportsRelations = relations(reports, ({ one }) => ({
+  user: one(users, {
+    fields: [reports.userId],
+    references: [users.id],
+  }),
+  study: one(studies, {
+    fields: [reports.studyId],
+    references: [studies.id],
+  }),
+  parentReport: one(reports, {
+    fields: [reports.parentId],
+    references: [reports.id],
+  }),
 }));
