@@ -1,47 +1,58 @@
 'use client';
 
 import { Block, Text } from '@lobehub/ui';
-import { App, Badge, Button, Dropdown, Table, Tag } from 'antd';
+import { App, Badge, Button, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import type { MenuProps } from 'antd';
-import { FileText, MoreVertical, Printer, Send, Eye, Trash2 } from 'lucide-react';
+import { FileText, Printer, Send } from 'lucide-react';
 import { useState } from 'react';
 import { Flexbox } from 'react-layout-kit';
 
 interface Report {
-  createdAt: string;
+  accessionNumber?: string;
+  date: string;
   id: string;
   modality: string;
+  patientId: string;
   patientName: string;
+  priority?: 'STAT' | 'URGENT' | 'ROUTINE';
   status: 'draft' | 'final' | 'signed' | 'sent';
-  studyDate: string;
+  studyDescription?: string;
 }
 
-// Mock data for demonstration
+// Mock data for demonstration - same structure as worklist
 const mockReports: Report[] = [
   {
     id: 'rpt_001',
     patientName: 'John Doe',
-    studyDate: '2024-11-13',
+    patientId: 'P123456',
+    date: '2024-11-13',
     modality: 'CT',
+    studyDescription: 'CT Chest without contrast',
+    priority: 'STAT',
     status: 'signed',
-    createdAt: '2024-11-13 14:30',
+    accessionNumber: 'ACC001',
   },
   {
     id: 'rpt_002',
     patientName: 'Jane Smith',
-    studyDate: '2024-11-13',
+    patientId: 'P789012',
+    date: '2024-11-13',
     modality: 'MR',
+    studyDescription: 'MR Brain',
+    priority: 'ROUTINE',
     status: 'draft',
-    createdAt: '2024-11-13 15:45',
+    accessionNumber: 'ACC002',
   },
   {
     id: 'rpt_003',
     patientName: 'Bob Johnson',
-    studyDate: '2024-11-12',
+    patientId: 'P345678',
+    date: '2024-11-12',
     modality: 'CR',
+    studyDescription: 'Chest X-ray',
+    priority: 'ROUTINE',
     status: 'sent',
-    createdAt: '2024-11-12 16:20',
+    accessionNumber: 'ACC003',
   },
 ];
 
@@ -65,65 +76,46 @@ const ReportsTable = () => {
     }
   };
 
-  const handleViewPDF = (report: Report) => {
-    message.info(`Opening PDF for ${report.patientName} (implementation pending)`);
+  const handleEdit = (report: Report) => {
+    // TODO: Navigate to /chat or report editor with report ID
+    message.info(`Editing report for ${report.patientName} (implementation pending)`);
   };
 
   const handlePrint = (report: Report) => {
+    // TODO: Open print dialog or send to printer
     message.info(`Printing report for ${report.patientName} (implementation pending)`);
   };
 
-  const handleSendToPACS = (report: Report) => {
+  const handleSend = (report: Report) => {
+    // TODO: C-STORE PDF to PACS
+    if (report.status !== 'signed') {
+      message.warning('Only signed reports can be sent to PACS');
+      return;
+    }
     message.info(`Sending to PACS for ${report.patientName} (implementation pending)`);
   };
 
-  const handleDelete = (report: Report) => {
-    message.warning(`Delete report for ${report.patientName}? (implementation pending)`);
-  };
-
-  const handleReopen = (report: Report) => {
-    message.info(`Reopening report for editing (implementation pending)`);
-  };
-
-  const getActionItems = (report: Report): MenuProps['items'] => [
-    {
-      key: 'view',
-      label: 'View PDF',
-      icon: <Eye size={14} />,
-      onClick: () => handleViewPDF(report),
-    },
-    {
-      key: 'print',
-      label: 'Print',
-      icon: <Printer size={14} />,
-      onClick: () => handlePrint(report),
-    },
-    {
-      key: 'send',
-      label: 'Send to PACS',
-      icon: <Send size={14} />,
-      onClick: () => handleSendToPACS(report),
-      disabled: report.status !== 'signed',
-    },
-    {
-      type: 'divider',
-    },
-    {
-      key: 'reopen',
-      label: 'Reopen',
-      icon: <FileText size={14} />,
-      onClick: () => handleReopen(report),
-    },
-    {
-      key: 'delete',
-      label: 'Delete',
-      icon: <Trash2 size={14} />,
-      danger: true,
-      onClick: () => handleDelete(report),
-    },
-  ];
-
   const columns: ColumnsType<Report> = [
+    {
+      title: 'Priority',
+      dataIndex: 'priority',
+      key: 'priority',
+      width: 100,
+      render: (priority: string) => {
+        if (!priority) return null;
+        const color = priority === 'STAT' ? 'red' : priority === 'URGENT' ? 'orange' : 'blue';
+        return <Tag color={color}>{priority}</Tag>;
+      },
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      width: 100,
+      render: (status: string) => (
+        <Tag color={getStatusColor(status)}>{status.toUpperCase()}</Tag>
+      ),
+    },
     {
       title: 'Patient Name',
       dataIndex: 'patientName',
@@ -131,9 +123,15 @@ const ReportsTable = () => {
       width: 200,
     },
     {
-      title: 'Study Date',
-      dataIndex: 'studyDate',
-      key: 'studyDate',
+      title: 'Patient ID',
+      dataIndex: 'patientId',
+      key: 'patientId',
+      width: 120,
+    },
+    {
+      title: 'Date',
+      dataIndex: 'date',
+      key: 'date',
       width: 120,
     },
     {
@@ -144,40 +142,42 @@ const ReportsTable = () => {
       render: (modality: string) => <Badge color="blue" text={modality} />,
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      width: 120,
-      render: (status: string) => (
-        <Tag color={getStatusColor(status)}>{status.toUpperCase()}</Tag>
-      ),
+      title: 'Study Description',
+      dataIndex: 'studyDescription',
+      key: 'studyDescription',
+      ellipsis: true,
     },
     {
-      title: 'Created',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      width: 150,
+      title: 'Accession #',
+      dataIndex: 'accessionNumber',
+      key: 'accessionNumber',
+      width: 120,
     },
     {
       title: 'Actions',
       key: 'actions',
-      width: 180,
+      width: 240,
       render: (_, report) => (
         <Flexbox gap={8} horizontal>
           <Button
-            icon={<Eye size={14} />}
-            onClick={() => handleViewPDF(report)}
+            icon={<FileText size={14} />}
+            onClick={() => handleEdit(report)}
             size="small"
             type="primary"
           >
-            View
+            Edit
           </Button>
           <Button icon={<Printer size={14} />} onClick={() => handlePrint(report)} size="small">
             Print
           </Button>
-          <Dropdown menu={{ items: getActionItems(report) }} trigger={['click']}>
-            <Button icon={<MoreVertical size={14} />} size="small" />
-          </Dropdown>
+          <Button
+            disabled={report.status !== 'signed'}
+            icon={<Send size={14} />}
+            onClick={() => handleSend(report)}
+            size="small"
+          >
+            Send
+          </Button>
         </Flexbox>
       ),
     },
