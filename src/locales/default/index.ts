@@ -29,6 +29,7 @@ import thread from './thread';
 import tool from './tool';
 import topic from './topic';
 import welcome from './welcome';
+import worklist from './worklist';
 
 const resources = {
   auth,
@@ -62,6 +63,7 @@ const resources = {
   tool,
   topic,
   welcome,
+  worklist,
 } as const;
 
 export default resources;
