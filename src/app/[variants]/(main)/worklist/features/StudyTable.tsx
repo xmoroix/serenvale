@@ -5,52 +5,18 @@ import { App, Badge, Button, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { FileText, ExternalLink } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { Flexbox } from 'react-layout-kit';
 
-interface Study {
-  accessionNumber?: string;
-  date: string;
-  id: string;
-  modality: string;
-  patientId: string;
-  patientName: string;
-  priority?: 'STAT' | 'URGENT' | 'ROUTINE';
-  studyDescription?: string;
-  studyInstanceUID: string;
+import type { Study } from '../_layout/Desktop';
+
+interface StudyTableProps {
+  loading: boolean;
+  studies: Study[];
 }
 
-// Mock data for demonstration
-const mockStudies: Study[] = [
-  {
-    id: 'std_001',
-    patientName: 'John Doe',
-    patientId: 'P123456',
-    date: '2024-11-13',
-    modality: 'CT',
-    studyDescription: 'CT Chest without contrast',
-    priority: 'STAT',
-    studyInstanceUID: '1.2.840.113619.2.55.1.1762',
-    accessionNumber: 'ACC001',
-  },
-  {
-    id: 'std_002',
-    patientName: 'Jane Smith',
-    patientId: 'P789012',
-    date: '2024-11-13',
-    modality: 'MR',
-    studyDescription: 'MR Brain',
-    priority: 'ROUTINE',
-    studyInstanceUID: '1.2.840.113619.2.55.1.1763',
-    accessionNumber: 'ACC002',
-  },
-];
-
-const StudyTable = () => {
+const StudyTable = ({ studies, loading }: StudyTableProps) => {
   const router = useRouter();
   const { message } = App.useApp();
-  const [studies, setStudies] = useState<Study[]>(mockStudies);
-  const [loading, setLoading] = useState(false);
 
   const handleOpenWeasis = (study: Study) => {
     // TODO: Generate Weasis URI and launch viewer

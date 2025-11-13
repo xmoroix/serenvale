@@ -2,9 +2,13 @@
 
 import { Block, Text } from '@lobehub/ui';
 import { App, Button, DatePicker, Form, Input, Select, Space } from 'antd';
+import dayjs from 'dayjs';
 import { Search } from 'lucide-react';
-import { useState } from 'react';
 import { Flexbox } from 'react-layout-kit';
+
+import { trpc } from '@/libs/trpc/client';
+
+import type { Study } from '../_layout/Desktop';
 
 const { RangePicker } = DatePicker;
 
@@ -17,22 +21,65 @@ interface QueryFilters {
   priority?: string;
 }
 
-const QueryPanel = () => {
+interface QueryPanelProps {
+  onQueryEnd: () => void;
+  onQueryResults: (studies: Study[]) => void;
+  onQueryStart: () => void;
+}
+
+const QueryPanel = ({ onQueryResults, onQueryStart, onQueryEnd }: QueryPanelProps) => {
   const [form] = Form.useForm<QueryFilters>();
   const { message } = App.useApp();
-  const [isQuerying, setIsQuerying] = useState(false);
 
   const handleQuery = async () => {
     try {
-      setIsQuerying(true);
+      onQueryStart();
       const values = await form.validateFields();
-      // TODO: Implement C-FIND query to PACS
-      console.log('Query PACS with filters:', values);
-      message.success('Querying PACS... (implementation pending)');
+
+      // Convert date range to DICOM format (YYYYMMDD-YYYYMMDD)
+      let studyDate: string | undefined;
+      if (values.dateRange && values.dateRange[0] && values.dateRange[1]) {
+        const startDate = dayjs(values.dateRange[0]).format('YYYYMMDD');
+        const endDate = dayjs(values.dateRange[1]).format('YYYYMMDD');
+        studyDate = `${startDate}-${endDate}`;
+      }
+
+      // Query PACS via tRPC
+      const result = await trpc.pacs.queryStudies.query({
+        accessionNumber: values.accessionNumber,
+        modality: values.modality,
+        patientId: values.patientId,
+        patientName: values.patientName,
+        studyDate,
+      });
+
+      if (result.success) {
+        // Map PACS results to Study format
+        const studies: Study[] = result.studies.map((study: any) => ({
+          accessionNumber: study.accessionNumber,
+          date: study.studyDate,
+          id: study.id,
+          modality: study.modality,
+          numberOfInstances: study.numberOfInstances,
+          numberOfSeries: study.numberOfSeries,
+          patientId: study.patientId,
+          patientName: study.patientName,
+          studyDescription: study.studyDescription || '',
+          studyInstanceUID: study.studyInstanceUID,
+        }));
+
+        onQueryResults(studies);
+        message.success(`Found ${studies.length} studies`);
+      } else {
+        message.error(result.error || 'Query failed');
+        onQueryResults([]);
+      }
     } catch (error) {
-      message.error('Query failed');
+      console.error('PACS query error:', error);
+      message.error('Failed to query PACS');
+      onQueryResults([]);
     } finally {
-      setIsQuerying(false);
+      onQueryEnd();
     }
   };
 
@@ -90,12 +137,7 @@ const QueryPanel = () => {
           </Flexbox>
 
           <Space>
-            <Button
-              icon={<Search size={16} />}
-              loading={isQuerying}
-              onClick={handleQuery}
-              type="primary"
-            >
+            <Button icon={<Search size={16} />} onClick={handleQuery} type="primary">
               Query PACS
             </Button>
             <Button onClick={() => form.resetFields()}>Clear</Button>
