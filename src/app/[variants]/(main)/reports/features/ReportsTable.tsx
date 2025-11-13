@@ -4,6 +4,7 @@ import { Block, Text } from '@lobehub/ui';
 import { App, Badge, Button, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { FileText, Printer, Send } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Flexbox } from 'react-layout-kit';
 
@@ -57,6 +58,7 @@ const mockReports: Report[] = [
 ];
 
 const ReportsTable = () => {
+  const router = useRouter();
   const { message } = App.useApp();
   const [reports, setReports] = useState<Report[]>(mockReports);
   const [loading, setLoading] = useState(false);
@@ -77,8 +79,19 @@ const ReportsTable = () => {
   };
 
   const handleEdit = (report: Report) => {
-    // TODO: Navigate to /chat or report editor with report ID
-    message.info(`Editing report for ${report.patientName} (implementation pending)`);
+    // Navigate to /chat with existing report for editing
+    const params = new URLSearchParams({
+      reportId: report.id,
+      patientName: report.patientName,
+      patientId: report.patientId,
+      modality: report.modality,
+      studyDate: report.date,
+      studyDescription: report.studyDescription || '',
+      accessionNumber: report.accessionNumber || '',
+      mode: 'radiology-report',
+      edit: 'true',
+    });
+    router.push(`/chat?${params.toString()}`);
   };
 
   const handlePrint = (report: Report) => {

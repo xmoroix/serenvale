@@ -4,6 +4,7 @@ import { Block, Text } from '@lobehub/ui';
 import { App, Badge, Button, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { FileText, ExternalLink } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Flexbox } from 'react-layout-kit';
 
@@ -46,6 +47,7 @@ const mockStudies: Study[] = [
 ];
 
 const StudyTable = () => {
+  const router = useRouter();
   const { message } = App.useApp();
   const [studies, setStudies] = useState<Study[]>(mockStudies);
   const [loading, setLoading] = useState(false);
@@ -57,8 +59,18 @@ const StudyTable = () => {
   };
 
   const handleStartReport = (study: Study) => {
-    // TODO: Navigate to /chat or /report with study context
-    message.info(`Starting report for ${study.patientName} (implementation pending)`);
+    // Navigate to /chat with study context for report generation
+    const params = new URLSearchParams({
+      studyId: study.id,
+      patientName: study.patientName,
+      patientId: study.patientId,
+      modality: study.modality,
+      studyDate: study.date,
+      studyDescription: study.studyDescription || '',
+      accessionNumber: study.accessionNumber || '',
+      mode: 'radiology-report',
+    });
+    router.push(`/chat?${params.toString()}`);
   };
 
   const columns: ColumnsType<Study> = [
