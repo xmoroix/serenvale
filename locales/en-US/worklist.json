@@ -1,0 +1,30 @@
+{
+  "header": {
+    "desc": "Query and view PACS worklist",
+    "title": "PACS Worklist"
+  },
+  "query": {
+    "accessionNumber": "Accession Number",
+    "clear": "Clear",
+    "dateRange": "Date Range",
+    "modality": "Modality",
+    "patientId": "Patient ID",
+    "patientName": "Patient Name",
+    "priority": "Priority",
+    "queryButton": "Query PACS",
+    "title": "Search Studies"
+  },
+  "table": {
+    "actions": "Actions",
+    "date": "Study Date",
+    "modality": "Modality",
+    "noData": "No studies found",
+    "openWeasis": "View Images",
+    "patientId": "Patient ID",
+    "patientName": "Patient Name",
+    "priority": "Priority",
+    "startReport": "Create Report",
+    "studyDescription": "Description",
+    "studiesFound": "{{count}} studies found"
+  }
+}

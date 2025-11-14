@@ -1,0 +1,34 @@
+{
+  "filter": {
+    "dateRange": "Plage de dates",
+    "modality": "Modalité",
+    "status": "Statut",
+    "title": "Filtrer les rapports"
+  },
+  "header": {
+    "desc": "Consulter et gérer les rapports radiologiques terminés",
+    "title": "Rapports"
+  },
+  "status": {
+    "draft": "Brouillon",
+    "final": "Final",
+    "sent": "Envoyé",
+    "signed": "Signé"
+  },
+  "table": {
+    "actions": "Actions",
+    "created": "Créé",
+    "delete": "Supprimer",
+    "modality": "Modalité",
+    "noData": "Aucun rapport trouvé",
+    "patientName": "Nom du patient",
+    "print": "Imprimer",
+    "reopen": "Rouvrir",
+    "reportsCount": "{{count}} rapports",
+    "sendToPACS": "Envoyer au PACS",
+    "status": "Statut",
+    "studyDate": "Date de l'examen",
+    "title": "Rapports terminés",
+    "viewPDF": "Voir le PDF"
+  }
+}
