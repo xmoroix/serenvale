@@ -26,8 +26,10 @@ import { messageRouter } from './message';
 import { pacsRouter } from './pacs';
 import { pluginRouter } from './plugin';
 import { ragEvalRouter } from './ragEval';
+import { reportRouter } from './report';
 import { sessionRouter } from './session';
 import { sessionGroupRouter } from './sessionGroup';
+import { studyRouter } from './study';
 import { threadRouter } from './thread';
 import { topicRouter } from './topic';
 import { uploadRouter } from './upload';
@@ -58,8 +60,10 @@ export const lambdaRouter = router({
   pacs: pacsRouter,
   plugin: pluginRouter,
   ragEval: ragEvalRouter,
+  report: reportRouter,
   session: sessionRouter,
   sessionGroup: sessionGroupRouter,
+  study: studyRouter,
   thread: threadRouter,
   topic: topicRouter,
   upload: uploadRouter,
