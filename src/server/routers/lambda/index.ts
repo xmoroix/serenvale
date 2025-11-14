@@ -9,6 +9,7 @@ import { aiModelRouter } from './aiModel';
 import { aiProviderRouter } from './aiProvider';
 import { apiKeyRouter } from './apiKey';
 import { chunkRouter } from './chunk';
+import { clinicConfigRouter } from './clinicConfig';
 import { comfyuiRouter } from './comfyui';
 import { configRouter } from './config';
 import { documentRouter } from './document';
@@ -27,6 +28,7 @@ import { pacsRouter } from './pacs';
 import { pluginRouter } from './plugin';
 import { ragEvalRouter } from './ragEval';
 import { reportRouter } from './report';
+import { reportTemplateRouter } from './reportTemplate';
 import { sessionRouter } from './session';
 import { sessionGroupRouter } from './sessionGroup';
 import { studyRouter } from './study';
@@ -42,6 +44,7 @@ export const lambdaRouter = router({
   aiProvider: aiProviderRouter,
   apiKey: apiKeyRouter,
   chunk: chunkRouter,
+  clinicConfig: clinicConfigRouter,
   comfyui: comfyuiRouter,
   config: configRouter,
   document: documentRouter,
@@ -61,6 +64,7 @@ export const lambdaRouter = router({
   plugin: pluginRouter,
   ragEval: ragEvalRouter,
   report: reportRouter,
+  reportTemplate: reportTemplateRouter,
   session: sessionRouter,
   sessionGroup: sessionGroupRouter,
   study: studyRouter,

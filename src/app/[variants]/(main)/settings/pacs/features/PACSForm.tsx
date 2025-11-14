@@ -1,10 +1,12 @@
 'use client';
 
 import { Block, Text } from '@lobehub/ui';
-import { App, Button, Divider, Form, Input, Space } from 'antd';
-import { useState } from 'react';
+import { App, Button, Form, Input, Space, Spin } from 'antd';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
+
+import { trpc } from '@/libs/trpc';
 
 interface PACSSettings {
   aeTitle: string;
@@ -21,33 +23,61 @@ const PACSForm = () => {
   const [form] = Form.useForm<PACSSettings>();
   const { message } = App.useApp();
   const [isSaving, setIsSaving] = useState(false);
+  const [clinicId, setClinicId] = useState<string | null>(null);
+
+  // Load clinic config on mount
+  const { data: clinicConfig, isLoading } = trpc.clinicConfig.getOrCreateConfig.useQuery();
+
+  // Set form values when config loads
+  useEffect(() => {
+    if (clinicConfig) {
+      setClinicId(clinicConfig.id);
+      if (clinicConfig.pacsConfig) {
+        form.setFieldsValue(clinicConfig.pacsConfig);
+      }
+    }
+  }, [clinicConfig, form]);
+
+  // Mutation for updating PACS config
+  const updatePacsMutation = trpc.clinicConfig.updatePacsConfig.useMutation();
 
   const handleSave = async () => {
     try {
       setIsSaving(true);
       const values = await form.validateFields();
-      // TODO: Save to database/store
-      console.log('PACS Settings:', values);
-      message.success('PACS settings saved successfully');
+
+      if (!clinicId) {
+        throw new Error('Clinic configuration not found');
+      }
+
+      await updatePacsMutation.mutateAsync({
+        id: clinicId,
+        ...values,
+      });
+
+      message.success(t('settingPACS.saveSuccess', 'PACS settings saved successfully'));
     } catch (error) {
-      message.error('Failed to save PACS settings');
+      console.error('Failed to save PACS settings:', error);
+      message.error(
+        t('settingPACS.saveFailed', 'Failed to save PACS settings: {{error}}', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+        }),
+      );
     } finally {
       setIsSaving(false);
     }
   };
 
+  if (isLoading) {
+    return (
+      <Flexbox align="center" justify="center" style={{ minHeight: 400 }}>
+        <Spin size="large" />
+      </Flexbox>
+    );
+  }
+
   return (
-    <Form
-      disabled={isSaving}
-      form={form}
-      initialValues={{
-        aeTitle: 'SERENVALE',
-        host: 'localhost',
-        port: 11112,
-      }}
-      layout="vertical"
-      requiredMark={false}
-    >
+    <Form disabled={isSaving} form={form} layout="vertical" requiredMark={false}>
       <Flexbox gap={24}>
         {/* Basic PACS Settings */}
         <Block
