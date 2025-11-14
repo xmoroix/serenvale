@@ -1,7 +1,7 @@
 'use client';
 
 import { App, Button, Modal, Space, Tag } from 'antd';
-import { FileText, Printer, Send, Save } from 'lucide-react';
+import { FileText, Printer, Send, Save, Check } from 'lucide-react';
 import { useState } from 'react';
 import { Flexbox } from 'react-layout-kit';
 
@@ -205,16 +205,107 @@ const ReportEditorModal = ({
     }
   };
 
+  const handleSign = async () => {
+    try {
+      setIsSaving(true);
+
+      if (!currentReportId) {
+        message.error('Please save the report before signing');
+        return;
+      }
+
+      // Must be finalized before signing
+      if (report.status === 'draft') {
+        message.warning('Please finalize the report before signing');
+        return;
+      }
+
+      await signReportMutation.mutateAsync({ id: currentReportId });
+      message.success('Report signed successfully');
+      // Update local status
+      report.status = 'signed';
+      onClose();
+    } catch (error) {
+      console.error('Failed to sign report:', error);
+      message.error('Failed to sign report');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handlePrint = () => {
     if (onPrint) {
       onPrint(content);
     } else {
-      // TODO: Implement print
-      message.info('Print functionality (implementation pending)');
+      // Generate print preview
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Radiology Report - ${report.patientInfo.name}</title>
+              <style>
+                body {
+                  font-family: 'Times New Roman', serif;
+                  margin: 2cm;
+                  line-height: 1.6;
+                }
+                h1 {
+                  text-align: center;
+                  font-size: 18pt;
+                  margin-bottom: 20px;
+                }
+                .header {
+                  border-bottom: 2px solid #000;
+                  padding-bottom: 10px;
+                  margin-bottom: 20px;
+                }
+                .patient-info {
+                  margin-bottom: 20px;
+                }
+                .content {
+                  white-space: pre-wrap;
+                  margin: 20px 0;
+                }
+                .footer {
+                  margin-top: 40px;
+                  border-top: 1px solid #000;
+                  padding-top: 10px;
+                }
+                @media print {
+                  body { margin: 1cm; }
+                }
+              </style>
+            </head>
+            <body>
+              <div class="header">
+                <h1>RADIOLOGY REPORT</h1>
+              </div>
+              <div class="patient-info">
+                <p><strong>Patient:</strong> ${report.patientInfo.name} (ID: ${report.patientInfo.id})</p>
+                <p><strong>Study Date:</strong> ${report.patientInfo.date}</p>
+                <p><strong>Modality:</strong> ${report.patientInfo.modality}</p>
+                ${report.patientInfo.studyDescription ? `<p><strong>Study:</strong> ${report.patientInfo.studyDescription}</p>` : ''}
+                ${report.patientInfo.accessionNumber ? `<p><strong>Accession #:</strong> ${report.patientInfo.accessionNumber}</p>` : ''}
+              </div>
+              <div class="content">${content.replace(/\n/g, '<br>')}</div>
+              <div class="footer">
+                <p><strong>Status:</strong> ${report.status?.toUpperCase() || 'DRAFT'}</p>
+                <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+              </div>
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+      } else {
+        message.error('Could not open print window. Please check your popup blocker.');
+      }
     }
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (report.status !== 'signed' && report.status !== 'final') {
       message.warning('Report must be finalized and signed before sending to PACS');
       return;
@@ -224,7 +315,30 @@ const ReportEditorModal = ({
       onSend(content);
       message.success('Report sent to PACS');
     } else {
-      message.info('Send to PACS (implementation pending)');
+      // TODO: Implement C-STORE to PACS
+      try {
+        setIsSaving(true);
+
+        if (!currentReportId) {
+          message.error('Please save the report before sending to PACS');
+          return;
+        }
+
+        // For now, just show a message
+        // In production, this would:
+        // 1. Generate PDF of the report
+        // 2. Use C-STORE to send PDF as DICOM SR to PACS
+        // 3. Update report status to 'sent'
+        message.info('Send to PACS (C-STORE implementation pending)');
+
+        // When implemented, call:
+        // await lambdaQuery.report.markReportAsSent.mutateAsync({ id: currentReportId });
+      } catch (error) {
+        console.error('Failed to send to PACS:', error);
+        message.error('Failed to send report to PACS');
+      } finally {
+        setIsSaving(false);
+      }
     }
   };
 
@@ -248,6 +362,15 @@ const ReportEditorModal = ({
             type="primary"
           >
             Finalize
+          </Button>
+          <Button
+            disabled={isSaving || report.status === 'draft' || report.status === 'signed'}
+            icon={<Check size={16} />}
+            loading={isSaving}
+            onClick={handleSign}
+            type={report.status === 'signed' ? 'default' : 'primary'}
+          >
+            {report.status === 'signed' ? 'Signed' : 'Sign Report'}
           </Button>
           <Button disabled={isSaving} icon={<Printer size={16} />} onClick={handlePrint}>
             Print
