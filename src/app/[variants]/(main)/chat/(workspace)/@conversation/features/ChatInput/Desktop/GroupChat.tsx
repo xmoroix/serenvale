@@ -20,15 +20,13 @@ import MessageFromUrl from './MessageFromUrl';
 import { useSendMenuItems } from './useSendMenuItems';
 
 const leftActions: ActionKeys[] = [
-  'typo',
   'fileUpload',
-  'knowledgeBase',
   '---',
   ['stt', 'clear'],
   'groupChatToken',
 ];
 
-const dmLeftActions: ActionKeys[] = ['typo', 'fileUpload', 'knowledgeBase', '---', ['stt']];
+const dmLeftActions: ActionKeys[] = ['fileUpload', '---', ['stt']];
 
 const rightActions: ActionKeys[] = ['saveTopic'];
 

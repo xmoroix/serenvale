@@ -1,5 +1,5 @@
 import { ActionIcon, ActionIconProps, Hotkey } from '@lobehub/ui';
-import { Compass, FolderClosed, MessageSquare, Palette } from 'lucide-react';
+import { ClipboardList, Compass, FileText, FolderClosed, MessageSquare, Palette } from 'lucide-react';
 import Link from 'next/link';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -36,6 +36,8 @@ const TopActions = memo<TopActionProps>(({ tab, isPinned }) => {
   const isServerMode = process.env.NEXT_PUBLIC_SERVICE_MODE === 'server';
 
   const isChatActive = tab === SidebarTabKey.Chat && !isPinned;
+  const isWorklistActive = tab === SidebarTabKey.Worklist;
+  const isReportsActive = tab === SidebarTabKey.Reports;
   const isFilesActive = tab === SidebarTabKey.Files;
   const isDiscoverActive = tab === SidebarTabKey.Discover;
   const isImageActive = tab === SidebarTabKey.Image;
@@ -66,6 +68,24 @@ const TopActions = memo<TopActionProps>(({ tab, isPinned }) => {
               <Hotkey inverseTheme keys={hotkey} />
             </Flexbox>
           }
+          tooltipProps={{ placement: 'right' }}
+        />
+      </Link>
+      <Link aria-label={t('tab.worklist')} href={'/worklist'}>
+        <ActionIcon
+          active={isWorklistActive}
+          icon={ClipboardList}
+          size={ICON_SIZE}
+          title={t('tab.worklist')}
+          tooltipProps={{ placement: 'right' }}
+        />
+      </Link>
+      <Link aria-label={t('tab.reports')} href={'/reports'}>
+        <ActionIcon
+          active={isReportsActive}
+          icon={FileText}
+          size={ICON_SIZE}
+          title={t('tab.reports')}
           tooltipProps={{ placement: 'right' }}
         />
       </Link>

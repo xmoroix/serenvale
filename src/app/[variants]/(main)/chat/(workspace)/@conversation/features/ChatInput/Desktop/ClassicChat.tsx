@@ -15,14 +15,9 @@ import MessageFromUrl from './MessageFromUrl';
 import { useSendMenuItems } from './useSendMenuItems';
 
 const leftActions: ActionKeys[] = [
-  'model',
-  'search',
-  'typo',
   'fileUpload',
-  'knowledgeBase',
-  'tools',
   '---',
-  ['params', 'history', 'stt', 'clear'],
+  ['stt', 'clear'],
   'mainToken',
 ];
 

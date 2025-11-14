@@ -340,7 +340,9 @@
     "files": "Fichiers",
     "knowledgeBase": "Base de connaissances",
     "me": "moi",
-    "setting": "Paramètre"
+    "reports": "Rapports",
+    "setting": "Paramètre",
+    "worklist": "Liste de travail"
   },
   "telemetry": {
     "allow": "Autoriser",
