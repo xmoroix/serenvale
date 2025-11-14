@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import { Search } from 'lucide-react';
 import { Flexbox } from 'react-layout-kit';
 
-import { trpc } from '@/libs/trpc/client';
+import { lambdaQuery } from '@/libs/trpc/client';
 
 import type { Study } from '../_layout/Desktop';
 
@@ -31,6 +31,8 @@ const QueryPanel = ({ onQueryResults, onQueryStart, onQueryEnd }: QueryPanelProp
   const [form] = Form.useForm<QueryFilters>();
   const { message } = App.useApp();
 
+  const queryMutation = lambdaQuery.pacs.queryStudies.useMutation();
+
   const handleQuery = async () => {
     try {
       onQueryStart();
@@ -45,7 +47,7 @@ const QueryPanel = ({ onQueryResults, onQueryStart, onQueryEnd }: QueryPanelProp
       }
 
       // Query PACS via tRPC
-      const result = await trpc.pacs.queryStudies.query({
+      const result = await queryMutation.mutateAsync({
         accessionNumber: values.accessionNumber,
         modality: values.modality,
         patientId: values.patientId,

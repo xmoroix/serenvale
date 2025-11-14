@@ -1,0 +1,30 @@
+{
+  "header": {
+    "desc": "Consulter et afficher la liste de travail PACS",
+    "title": "Liste de travail PACS"
+  },
+  "query": {
+    "accessionNumber": "Numéro d'accession",
+    "clear": "Effacer",
+    "dateRange": "Plage de dates",
+    "modality": "Modalité",
+    "patientId": "ID Patient",
+    "patientName": "Nom du patient",
+    "priority": "Priorité",
+    "queryButton": "Requête PACS",
+    "title": "Rechercher des examens"
+  },
+  "table": {
+    "actions": "Actions",
+    "date": "Date de l'examen",
+    "modality": "Modalité",
+    "noData": "Aucun examen trouvé",
+    "openWeasis": "Voir les images",
+    "patientId": "ID Patient",
+    "patientName": "Nom du patient",
+    "priority": "Priorité",
+    "startReport": "Créer un rapport",
+    "studyDescription": "Description",
+    "studiesFound": "{{count}} examens trouvés"
+  }
+}
