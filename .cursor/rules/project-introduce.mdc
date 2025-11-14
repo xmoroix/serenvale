@@ -4,15 +4,14 @@ alwaysApply: true
 
 ## Project Description
 
-You are developing an open-source, modern-design AI chat framework: lobehub(previous lobe-chat).
+You are developing Serenvale - an AI-powered radiology reporting system with PACS integration, built on the LobeChat framework.
 
 Supported platforms:
 
 - web desktop/mobile
 - desktop(electron)
-- mobile app(react native), coming soon
 
-logo emoji: 🤯
+logo emoji: 🏥
 
 ## Project Technologies Stack
 

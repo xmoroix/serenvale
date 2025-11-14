@@ -6,7 +6,7 @@ import { manifestModule } from '@/server/manifest';
 
 const manifest = (): MetadataRoute.Manifest | any => {
   return manifestModule.generate({
-    description: `${BRANDING_NAME} brings you the best UI experience for ChatGPT, Claude, Gemini, and OLLaMA.`,
+    description: `${BRANDING_NAME} - AI-powered radiology reporting system with PACS integration and intelligent report generation.`,
     icons: [
       {
         purpose: 'any',
