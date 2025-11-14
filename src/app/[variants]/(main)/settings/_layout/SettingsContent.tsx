@@ -33,6 +33,18 @@ const componentMap = {
   [SettingsTabs.Hotkey]: dynamic(() => import('../hotkey'), {
     loading: () => <Loading />,
   }),
+  [SettingsTabs.PACS]: dynamic(() => import('../pacs'), {
+    loading: () => <Loading />,
+  }),
+  [SettingsTabs.Clinic]: dynamic(() => import('../clinic'), {
+    loading: () => <Loading />,
+  }),
+  [SettingsTabs.Doctor]: dynamic(() => import('../doctor'), {
+    loading: () => <Loading />,
+  }),
+  [SettingsTabs.Printer]: dynamic(() => import('../printer'), {
+    loading: () => <Loading />,
+  }),
   [SettingsTabs.Proxy]: dynamic(() => import('../proxy'), {
     loading: () => <Loading />,
   }),

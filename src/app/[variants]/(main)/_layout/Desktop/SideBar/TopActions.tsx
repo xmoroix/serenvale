@@ -80,28 +80,7 @@ const TopActions = memo<TopActionProps>(({ tab, isPinned }) => {
           />
         </Link>
       )}
-      {showAiImage && (
-        <Link aria-label={t('tab.aiImage')} href={'/image'}>
-          <ActionIcon
-            active={isImageActive}
-            icon={Palette}
-            size={ICON_SIZE}
-            title={t('tab.aiImage')}
-            tooltipProps={{ placement: 'right' }}
-          />
-        </Link>
-      )}
-      {showMarket && (
-        <Link aria-label={t('tab.discover')} href={'/discover'}>
-          <ActionIcon
-            active={isDiscoverActive}
-            icon={Compass}
-            size={ICON_SIZE}
-            title={t('tab.discover')}
-            tooltipProps={{ placement: 'right' }}
-          />
-        </Link>
-      )}
+      {/* Removed AI Image and Market/Discover for radiology system */}
     </Flexbox>
   );
 });

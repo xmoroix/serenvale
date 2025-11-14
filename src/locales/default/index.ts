@@ -23,12 +23,14 @@ import plugin from './plugin';
 import portal from './portal';
 import providers from './providers';
 import ragEval from './ragEval';
+import reports from './reports';
 import setting from './setting';
 import subscription from './subscription';
 import thread from './thread';
 import tool from './tool';
 import topic from './topic';
 import welcome from './welcome';
+import worklist from './worklist';
 
 const resources = {
   auth,
@@ -56,12 +58,14 @@ const resources = {
   portal,
   providers,
   ragEval,
+  reports,
   setting,
   subscription,
   thread,
   tool,
   topic,
   welcome,
+  worklist,
 } as const;
 
 export default resources;

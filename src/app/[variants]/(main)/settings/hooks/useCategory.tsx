@@ -2,14 +2,18 @@ import { Icon } from '@lobehub/ui';
 import {
   Bot,
   Brain,
+  Building2,
   Database,
   EthernetPort,
   Image as ImageIcon,
   Info,
   KeyboardIcon,
   Mic2,
+  Printer,
   Settings2,
   Sparkles,
+  Stethoscope,
+  Workflow,
 } from 'lucide-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -72,6 +76,29 @@ export const useCategory = () => {
           icon: <Icon icon={Sparkles} />,
           key: SettingsTabs.SystemAgent,
           label: t('tab.system-agent'),
+        },
+        {
+          type: 'divider',
+        },
+        {
+          icon: <Icon icon={Workflow} />,
+          key: SettingsTabs.PACS,
+          label: t('tab.pacs'),
+        },
+        {
+          icon: <Icon icon={Building2} />,
+          key: SettingsTabs.Clinic,
+          label: t('tab.clinic'),
+        },
+        {
+          icon: <Icon icon={Stethoscope} />,
+          key: SettingsTabs.Doctor,
+          label: t('tab.doctor'),
+        },
+        {
+          icon: <Icon icon={Printer} />,
+          key: SettingsTabs.Printer,
+          label: t('tab.printer'),
         },
         {
           type: 'divider',

@@ -45,7 +45,7 @@ const HeaderAction = memo<{ className?: string }>(({ className }) => {
           placement: 'bottom',
         }}
       />
-      <ShareButton />
+      {/* Removed ShareButton for radiology system */}
       <ActionIcon
         icon={showAgentSettings ? PanelRightClose : PanelRightOpen}
         onClick={() => toggleConfig()}
