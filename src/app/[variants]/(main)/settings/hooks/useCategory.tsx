@@ -9,6 +9,7 @@ import {
   Info,
   KeyboardIcon,
   Mic2,
+  Palette,
   Printer,
   Settings2,
   Sparkles,
@@ -99,6 +100,11 @@ export const useCategory = () => {
           icon: <Icon icon={Printer} />,
           key: SettingsTabs.Printer,
           label: t('tab.printer'),
+        },
+        {
+          icon: <Icon icon={Palette} />,
+          key: SettingsTabs.Branding,
+          label: t('tab.branding'),
         },
         {
           type: 'divider',

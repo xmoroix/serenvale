@@ -34,6 +34,7 @@ export enum GroupSettingsTabs {
 export enum SettingsTabs {
   About = 'about',
   Agent = 'agent',
+  Branding = 'branding',
   Clinic = 'clinic',
   Common = 'common',
   Doctor = 'doctor',
