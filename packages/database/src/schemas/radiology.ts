@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix  */
-import { index, integer, jsonb, pgTable, text, varchar } from 'drizzle-orm/pg-core';
+import { boolean, index, integer, jsonb, pgTable, text, varchar } from 'drizzle-orm/pg-core';
 import { createInsertSchema } from 'drizzle-zod';
 
 import { idGenerator } from '../utils/idGenerator';
@@ -136,3 +136,110 @@ export const insertReportSchema = createInsertSchema(reports);
 
 export type NewReport = typeof reports.$inferInsert;
 export type ReportItem = typeof reports.$inferSelect;
+
+/**
+ * Clinic Configuration table
+ * Global settings for the entire clinic (PACS, clinic info, etc.)
+ */
+export const clinicConfig = pgTable('clinic_config', {
+  id: text('id')
+    .$defaultFn(() => idGenerator('clinic'))
+    .primaryKey(),
+
+  // Clinic information
+  name: text('name').notNull(),
+  address: text('address'),
+  phone: text('phone'),
+  email: text('email'),
+  logo: text('logo'), // URL or path to logo
+  director: text('director'),
+  accreditation: text('accreditation'),
+
+  // PACS configuration (global for all doctors)
+  pacsConfig: jsonb('pacs_config').$type<{
+    host: string;
+    port: number;
+    aeTitle: string;
+    queryNode?: string;
+    storeNode?: string;
+    username?: string;
+    password?: string;
+  }>(),
+
+  // Additional global settings
+  settings: jsonb('settings').$type<{
+    defaultLanguage?: 'fr' | 'en';
+    timezone?: string;
+    reportNumberPrefix?: string;
+  }>(),
+
+  ...timestamps,
+});
+
+export const insertClinicConfigSchema = createInsertSchema(clinicConfig);
+
+export type NewClinicConfig = typeof clinicConfig.$inferInsert;
+export type ClinicConfigItem = typeof clinicConfig.$inferSelect;
+
+/**
+ * Report Templates table
+ * Predefined templates (global) or custom templates (per-doctor)
+ */
+export const reportTemplates = pgTable(
+  'report_templates',
+  {
+    id: text('id')
+      .$defaultFn(() => idGenerator('template'))
+      .primaryKey(),
+
+    // Template name
+    name: text('name').notNull(),
+
+    // Template description
+    description: text('description'),
+
+    // Modality this template is for
+    modality: varchar('modality', { length: 50 }),
+
+    // Template sections structure
+    sections: jsonb('sections').$type<
+      Array<{
+        title: string;
+        content?: string;
+        order: number;
+        required?: boolean;
+      }>
+    >(),
+
+    // Full template content (with placeholders)
+    content: text('content'),
+
+    // Language of the template
+    language: varchar('language', { length: 10 }).$type<'fr' | 'en'>().notNull().default('fr'),
+
+    // Is this a global (clinic-wide) template?
+    isGlobal: boolean('is_global').notNull().default(false),
+
+    // If personal template, which doctor owns it
+    userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }),
+
+    // Template metadata
+    metadata: jsonb('metadata').$type<{
+      tags?: string[];
+      category?: string;
+      version?: string;
+    }>(),
+
+    ...timestamps,
+  },
+  (t) => ({
+    modalityIdx: index('report_templates_modality_idx').on(t.modality),
+    userIdIdx: index('report_templates_user_id_idx').on(t.userId),
+    isGlobalIdx: index('report_templates_is_global_idx').on(t.isGlobal),
+  }),
+);
+
+export const insertReportTemplateSchema = createInsertSchema(reportTemplates);
+
+export type NewReportTemplate = typeof reportTemplates.$inferInsert;
+export type ReportTemplateItem = typeof reportTemplates.$inferSelect;
