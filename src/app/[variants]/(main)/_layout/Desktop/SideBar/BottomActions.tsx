@@ -21,24 +21,7 @@ const BottomActions = memo(() => {
 
   return (
     <Flexbox gap={8}>
-      {!hideGitHub && (
-        <Link aria-label={'GitHub'} href={GITHUB} target={'_blank'}>
-          <ActionIcon
-            icon={Github}
-            size={ICON_SIZE}
-            title={'GitHub'}
-            tooltipProps={{ placement: 'right' }}
-          />
-        </Link>
-      )}
-      <Link aria-label={t('labs')} href={'/labs'}>
-        <ActionIcon
-          icon={FlaskConical}
-          size={ICON_SIZE}
-          title={t('labs')}
-          tooltipProps={{ placement: 'right' }}
-        />
-      </Link>
+      {/* Removed GitHub and Labs for radiology system */}
     </Flexbox>
   );
 });

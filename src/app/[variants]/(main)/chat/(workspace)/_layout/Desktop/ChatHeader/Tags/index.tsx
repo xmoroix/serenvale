@@ -50,11 +50,8 @@ const TitleTags = memo(() => {
     <Skeleton.Button active size={'small'} style={{ height: 20 }} />
   ) : (
     <Flexbox align={'center'} gap={4} horizontal>
-      <ModelSwitchPanel>
-        <ModelTag model={model} />
-      </ModelSwitchPanel>
+      {/* Removed ModelSwitchPanel and PluginTag for radiology system */}
       {isAgentEnableSearch && <SearchTags />}
-      {showPlugin && plugins?.length > 0 && <PluginTag plugins={plugins} />}
       {hasKnowledge && <KnowledgeTag data={enabledKnowledge} />}
       {enableHistoryCount && <HistoryLimitTags />}
     </Flexbox>
