@@ -111,6 +111,14 @@ export const reports = pgTable(
       findings?: string[];
       impression?: string;
       recommendations?: string[];
+      // Patient info (denormalized for easy display without joins)
+      patientName?: string;
+      patientId?: string;
+      modality?: string;
+      studyDate?: string;
+      studyDescription?: string;
+      accessionNumber?: string;
+      priority?: 'STAT' | 'URGENT' | 'ROUTINE';
     }>(),
 
     // Timestamps for workflow

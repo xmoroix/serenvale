@@ -5,6 +5,8 @@ import { FileText, Printer, Send, Save } from 'lucide-react';
 import { useState } from 'react';
 import { Flexbox } from 'react-layout-kit';
 
+import { lambdaQuery } from '@/libs/trpc/client';
+
 interface ReportData {
   aiContent: string;
   clinicInfo?: {
@@ -26,6 +28,7 @@ interface ReportData {
     studyDescription?: string;
   };
   reportId?: string;
+  studyId?: string;
   status?: 'draft' | 'final' | 'signed' | 'sent';
 }
 
@@ -103,24 +106,102 @@ const ReportEditorModal = ({
   };
 
   const [content, setContent] = useState(assembleReport());
+  const [currentReportId, setCurrentReportId] = useState(report.reportId);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = () => {
-    if (onSave) {
-      onSave(content);
-      message.success('Report saved as draft');
-    } else {
-      // TODO: Implement database save
-      message.info('Save functionality (implementation pending)');
+  const createReportMutation = lambdaQuery.report.createReport.useMutation();
+  const updateReportMutation = lambdaQuery.report.updateReport.useMutation();
+  const signReportMutation = lambdaQuery.report.signReport.useMutation();
+
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+
+      if (onSave) {
+        onSave(content);
+        message.success('Report saved as draft');
+      } else {
+        // Create or update the report
+        if (currentReportId) {
+          // Update existing report
+          await updateReportMutation.mutateAsync({
+            id: currentReportId,
+            value: {
+              content,
+              status: 'draft',
+            },
+          });
+          message.success('Report updated as draft');
+        } else {
+          // Create new report
+          const reportId = await createReportMutation.mutateAsync({
+            studyId: report.studyId || null,
+            content,
+            status: 'draft',
+            metadata: {
+              patientName: report.patientInfo.name,
+              patientId: report.patientInfo.id,
+              modality: report.patientInfo.modality,
+              studyDate: report.patientInfo.date,
+              studyDescription: report.patientInfo.studyDescription,
+              accessionNumber: report.patientInfo.accessionNumber,
+            },
+          });
+          setCurrentReportId(reportId);
+          message.success('Report saved as draft');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to save report:', error);
+      message.error('Failed to save report');
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  const handleFinalize = () => {
-    if (onFinalize) {
-      onFinalize(content);
-      message.success('Report finalized');
-      onClose();
-    } else {
-      message.info('Finalize functionality (implementation pending)');
+  const handleFinalize = async () => {
+    try {
+      setIsSaving(true);
+
+      if (onFinalize) {
+        onFinalize(content);
+        message.success('Report finalized');
+        onClose();
+      } else {
+        // Create or update the report with final status
+        if (currentReportId) {
+          await updateReportMutation.mutateAsync({
+            id: currentReportId,
+            value: {
+              content,
+              status: 'final',
+            },
+          });
+          message.success('Report finalized');
+        } else {
+          const reportId = await createReportMutation.mutateAsync({
+            studyId: report.studyId || null,
+            content,
+            status: 'final',
+            metadata: {
+              patientName: report.patientInfo.name,
+              patientId: report.patientInfo.id,
+              modality: report.patientInfo.modality,
+              studyDate: report.patientInfo.date,
+              studyDescription: report.patientInfo.studyDescription,
+              accessionNumber: report.patientInfo.accessionNumber,
+            },
+          });
+          setCurrentReportId(reportId);
+          message.success('Report finalized');
+        }
+        onClose();
+      }
+    } catch (error) {
+      console.error('Failed to finalize report:', error);
+      message.error('Failed to finalize report');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -151,17 +232,28 @@ const ReportEditorModal = ({
     <Modal
       footer={[
         <Space key="actions">
-          <Button icon={<Save size={16} />} onClick={handleSave}>
+          <Button
+            disabled={isSaving}
+            icon={<Save size={16} />}
+            loading={isSaving}
+            onClick={handleSave}
+          >
             Save Draft
           </Button>
-          <Button icon={<FileText size={16} />} onClick={handleFinalize} type="primary">
+          <Button
+            disabled={isSaving}
+            icon={<FileText size={16} />}
+            loading={isSaving}
+            onClick={handleFinalize}
+            type="primary"
+          >
             Finalize
           </Button>
-          <Button icon={<Printer size={16} />} onClick={handlePrint}>
+          <Button disabled={isSaving} icon={<Printer size={16} />} onClick={handlePrint}>
             Print
           </Button>
           <Button
-            disabled={report.status !== 'signed' && report.status !== 'final'}
+            disabled={isSaving || (report.status !== 'signed' && report.status !== 'final')}
             icon={<Send size={16} />}
             onClick={handleSend}
           >

@@ -24,6 +24,17 @@ export const reportRouter = router({
         status: z.enum(['draft', 'final', 'signed', 'sent']).optional(),
         language: z.enum(['fr', 'en']).optional(),
         agentId: z.string().optional(),
+        metadata: z
+          .object({
+            patientName: z.string().optional(),
+            patientId: z.string().optional(),
+            modality: z.string().optional(),
+            studyDate: z.string().optional(),
+            studyDescription: z.string().optional(),
+            accessionNumber: z.string().optional(),
+            priority: z.enum(['STAT', 'URGENT', 'ROUTINE']).optional(),
+          })
+          .optional(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
@@ -34,6 +45,7 @@ export const reportRouter = router({
         language: input.language || 'fr',
         agentId: input.agentId,
         version: 1,
+        metadata: input.metadata as any,
       });
 
       return data.id;
@@ -115,11 +127,22 @@ export const reportRouter = router({
           status: z.enum(['draft', 'final', 'signed', 'sent']).optional(),
           language: z.enum(['fr', 'en']).optional(),
           pdfBlob: z.string().optional(),
+          metadata: z
+            .object({
+              patientName: z.string().optional(),
+              patientId: z.string().optional(),
+              modality: z.string().optional(),
+              studyDate: z.string().optional(),
+              studyDescription: z.string().optional(),
+              accessionNumber: z.string().optional(),
+              priority: z.enum(['STAT', 'URGENT', 'ROUTINE']).optional(),
+            })
+            .optional(),
         }),
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      return ctx.reportModel.update(input.id, input.value);
+      return ctx.reportModel.update(input.id, input.value as any);
     }),
 
   /**
