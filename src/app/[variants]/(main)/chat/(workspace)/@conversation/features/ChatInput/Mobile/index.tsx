@@ -19,13 +19,10 @@ import { sessionSelectors } from '@/store/session/selectors';
 import { useSend, useSendGroupMessage } from '../useSend';
 
 const leftActions: ActionKeys[] = [
-  'model',
-  'search',
   'fileUpload',
   'knowledgeBase',
-  'tools',
   '---',
-  ['params', 'history', 'stt', 'clear'],
+  ['stt', 'clear'],
   'mainToken',
   'mention',
 ];

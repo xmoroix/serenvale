@@ -5,16 +5,12 @@ import { Alert, Tag } from 'antd';
 import { Stethoscope } from 'lucide-react';
 import { Flexbox } from 'react-layout-kit';
 
-import type { StudyMetadata } from '../hooks/useRadiologyContext';
+import { useRadiologyContext } from '../hooks/useRadiologyContext';
 
-interface RadiologyBannerProps {
-  isEditing: boolean;
-  reportId?: string;
-  studyMetadata?: StudyMetadata;
-}
+const RadiologyBanner = () => {
+  const { isRadiologyMode, studyMetadata, isEditing, reportId } = useRadiologyContext();
 
-const RadiologyBanner = ({ studyMetadata, isEditing, reportId }: RadiologyBannerProps) => {
-  if (!studyMetadata) return null;
+  if (!isRadiologyMode || !studyMetadata) return null;
 
   return (
     <Block

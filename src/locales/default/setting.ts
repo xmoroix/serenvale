@@ -663,6 +663,7 @@ export default {
   tab: {
     'about': '关于',
     'agent': '默认助手',
+    'branding': 'Branding & Logo',
     'clinic': 'Clinic Information',
     'common': '通用设置',
     'doctor': 'Doctor Profile',

@@ -12,7 +12,9 @@ export enum SidebarTabKey {
   Files = 'files',
   Image = 'image',
   Me = 'me',
+  Reports = 'reports',
   Setting = 'settings',
+  Worklist = 'worklist',
 }
 
 export enum ChatSettingsTabs {
@@ -34,6 +36,7 @@ export enum GroupSettingsTabs {
 export enum SettingsTabs {
   About = 'about',
   Agent = 'agent',
+  Branding = 'branding',
   Clinic = 'clinic',
   Common = 'common',
   Doctor = 'doctor',
