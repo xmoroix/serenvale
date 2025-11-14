@@ -90,7 +90,7 @@ const DoctorForm = () => {
               <Text type={'secondary'}>Upload or draw your signature for PDF reports</Text>
             </Flexbox>
 
-            <Form.Item label="Signature Image" name="signature">
+            <Form.Item label="Signature Image" name="signature" valuePropName="fileList">
               <Upload accept="image/*" listType="picture-card" maxCount={1}>
                 <div>
                   <div style={{ marginTop: 8 }}>Upload Signature</div>
@@ -98,7 +98,7 @@ const DoctorForm = () => {
               </Upload>
             </Form.Item>
 
-            <Form.Item label="Official Stamp" name="stamp">
+            <Form.Item label="Official Stamp" name="stamp" valuePropName="fileList">
               <Upload accept="image/*" listType="picture-card" maxCount={1}>
                 <div>
                   <div style={{ marginTop: 8 }}>Upload Stamp</div>

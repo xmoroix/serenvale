@@ -94,7 +94,7 @@ const ClinicForm = () => {
               <Text type={'secondary'}>Logo and letterhead for reports</Text>
             </Flexbox>
 
-            <Form.Item label="Logo" name="logo">
+            <Form.Item label="Logo" name="logo" valuePropName="fileList">
               <Upload accept="image/*" listType="picture-card" maxCount={1}>
                 <div>
                   <div style={{ marginTop: 8 }}>Upload Logo</div>

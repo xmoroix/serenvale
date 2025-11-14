@@ -3,16 +3,16 @@ description: Project directory structure overview
 alwaysApply: false
 ---
 
-# LobeChat Project Structure
+# Serenvale Project Structure
 
 ## Complete Project Structure
 
-This project uses common monorepo structure. The workspace packages name use `@lobechat/` namespace.
+This project uses common monorepo structure. The workspace packages name use `@lobechat/` namespace (inherited from LobeChat framework).
 
 **note**: some not very important files are not shown for simplicity.
 
 ```plaintext
-lobe-chat/
+Serenvale/
 ├── apps/
 │   └── desktop/
 ├── docs/

@@ -1,29 +1,28 @@
 {
-  "name": "@lobehub/chat",
+  "name": "@serenvale/radiology",
   "version": "1.142.9",
-  "description": "Lobe Chat - an open-source, high-performance chatbot framework that supports speech synthesis, multimodal, and extensible Function Call plugin system. Supports one-click free deployment of your private ChatGPT/LLM web application.",
+  "description": "Serenvale - AI-powered radiology reporting system with PACS integration, study management, and intelligent report generation for modern medical imaging workflows.",
   "keywords": [
-    "framework",
-    "chatbot",
-    "chatgpt",
+    "radiology",
+    "PACS",
+    "DICOM",
+    "medical-imaging",
+    "healthcare",
+    "reporting",
+    "AI",
     "nextjs",
-    "vercel-ai",
-    "openai",
-    "azure-openai",
-    "visual-model",
-    "tts",
-    "stt"
+    "typescript"
   ],
-  "homepage": "https://github.com/lobehub/lobe-chat",
+  "homepage": "https://github.com/xmoroix/Serenvale",
   "bugs": {
-    "url": "https://github.com/lobehub/lobe-chat/issues/new/choose"
+    "url": "https://github.com/xmoroix/Serenvale/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lobehub/lobe-chat.git"
+    "url": "https://github.com/xmoroix/Serenvale.git"
   },
   "license": "MIT",
-  "author": "LobeHub <i@lobehub.com>",
+  "author": "Serenvale <info@serenvale.com>",
   "sideEffects": false,
   "workspaces": [
     "packages/*",
@@ -44,7 +43,7 @@
     "db:generate-client": "tsx ./scripts/migrateClientDB/compile-migrations.ts",
     "db:migrate": "MIGRATION_DB=1 tsx ./scripts/migrateServerDB/index.ts",
     "db:studio": "drizzle-kit studio",
-    "db:visualize": "dbdocs build docs/development/database-schema.dbml --project lobe-chat",
+    "db:visualize": "dbdocs build docs/development/database-schema.dbml --project serenvale",
     "desktop:build": "npm run desktop:build-next && npm run desktop:prepare-dist && npm run desktop:build-electron",
     "desktop:build-electron": "tsx scripts/electronWorkflow/buildElectron.ts",
     "desktop:build-local": "npm run desktop:build-next && npm run desktop:prepare-dist && npm run build-local --prefix=./apps/desktop",
@@ -73,9 +72,9 @@
     "reinstall": "rm -rf pnpm-lock.yaml && rm -rf node_modules && pnpm -r exec rm -rf node_modules && pnpm install",
     "reinstall:desktop": "rm -rf pnpm-lock.yaml && rm -rf node_modules && pnpm -r exec rm -rf node_modules && pnpm install --node-linker=hoisted",
     "release": "semantic-release",
-    "self-hosting:docker": "docker build -t lobe-chat:local .",
-    "self-hosting:docker-cn": "docker build -t lobe-chat-local --build-arg USE_CN_MIRROR=true .",
-    "self-hosting:docker-cn@database": "docker build -t lobe-chat-database-local -f Dockerfile.database --build-arg USE_CN_MIRROR=true .",
+    "self-hosting:docker": "docker build -t serenvale:local .",
+    "self-hosting:docker-cn": "docker build -t serenvale-local --build-arg USE_CN_MIRROR=true .",
+    "self-hosting:docker-cn@database": "docker build -t serenvale-database-local -f Dockerfile.database --build-arg USE_CN_MIRROR=true .",
     "start": "next start -p 3210",
     "stylelint": "stylelint \"src/**/*.{js,jsx,ts,tsx}\" --fix",
     "test": "npm run test-app && npm run test-server",
