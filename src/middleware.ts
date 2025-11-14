@@ -44,6 +44,10 @@ export const config = {
     '/profile(.*)',
     '/me',
     '/me(.*)',
+    '/worklist',
+    '/worklist(.*)',
+    '/reports',
+    '/reports(.*)',
 
     '/login(.*)',
     '/signup(.*)',
