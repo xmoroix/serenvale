@@ -17,7 +17,7 @@ const OpenReportEditorButton = () => {
 
   // Get the last assistant message content
   const messages = useChatStore((s) => s.messages);
-  const lastAssistantMessage = [...messages]
+  const lastAssistantMessage = [...(messages || [])]
     .reverse()
     .find((msg) => msg.role === 'assistant');
 
