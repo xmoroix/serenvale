@@ -8,6 +8,8 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Flexbox } from 'react-layout-kit';
 
+import { useReportEditorStore } from '@/store/report';
+
 interface Report {
   accessionNumber?: string;
   date: string;
@@ -62,6 +64,7 @@ const ReportsTable = () => {
   const { message } = App.useApp();
   const [reports, setReports] = useState<Report[]>(mockReports);
   const [loading, setLoading] = useState(false);
+  const openEditor = useReportEditorStore((s) => s.openEditor);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -79,19 +82,21 @@ const ReportsTable = () => {
   };
 
   const handleEdit = (report: Report) => {
-    // Navigate to /chat with existing report for editing
-    const params = new URLSearchParams({
+    // TODO: Load actual report content from database
+    // For now, use placeholder content
+    openEditor({
       reportId: report.id,
-      patientName: report.patientName,
-      patientId: report.patientId,
-      modality: report.modality,
-      studyDate: report.date,
-      studyDescription: report.studyDescription || '',
-      accessionNumber: report.accessionNumber || '',
-      mode: 'radiology-report',
-      edit: 'true',
+      aiContent: `[Report content for ${report.patientName} would be loaded from database here]\n\nThis is a placeholder report that would normally be loaded from the database.\n\nPatient: ${report.patientName}\nStudy: ${report.studyDescription}\nModality: ${report.modality}`,
+      patientInfo: {
+        id: report.patientId,
+        name: report.patientName,
+        date: report.date,
+        modality: report.modality,
+        studyDescription: report.studyDescription,
+        accessionNumber: report.accessionNumber,
+      },
+      status: report.status as 'draft' | 'final',
     });
-    router.push(`/chat?${params.toString()}`);
   };
 
   const handlePrint = (report: Report) => {
