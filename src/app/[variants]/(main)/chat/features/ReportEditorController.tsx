@@ -1,39 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useReportEditorStore } from '@/store/report';
 
 import ReportEditorModal from './ReportEditorModal';
 
 /**
  * ReportEditorController - Manages the report editor modal state
- * Only renders the modal when actually needed to avoid SSR issues
+ * Opens when triggered by the global report editor store
  */
 const ReportEditorController = () => {
-  const [isVisible, setIsVisible] = useState(false);
+  const { isVisible, currentReport, closeEditor } = useReportEditorStore();
 
-  // TODO: Wire this to topic click events (orange dot topics)
-  // For now, the modal is hidden and won't cause SSR errors
-
-  if (!isVisible) {
+  if (!isVisible || !currentReport) {
     return null;
   }
 
-  // Mock data for when modal is shown
-  const mockReport = {
-    aiContent: 'Report content will be loaded from the topic...',
-    patientInfo: {
-      id: 'P000',
-      name: 'Patient Name',
-      date: new Date().toLocaleDateString(),
-      modality: 'CT',
-    },
-    status: 'draft' as const,
-  };
-
   return (
     <ReportEditorModal
-      onClose={() => setIsVisible(false)}
-      report={mockReport}
+      onClose={closeEditor}
+      report={currentReport}
       visible={isVisible}
     />
   );

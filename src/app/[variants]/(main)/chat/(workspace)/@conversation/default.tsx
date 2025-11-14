@@ -1,6 +1,7 @@
 import { DynamicLayoutProps } from '@/types/next';
 import { RouteVariants } from '@/utils/server/routeVariants';
 
+import OpenReportEditorButton from '../../features/OpenReportEditorButton';
 import RadiologyBanner from '../../features/RadiologyBanner';
 import ReportEditorController from '../../features/ReportEditorController';
 import ChatHydration from './features/ChatHydration';
@@ -18,6 +19,7 @@ const ChatConversation = async (props: DynamicLayoutProps) => {
       <ZenModeToast />
       <RadiologyBanner />
       <ChatList mobile={isMobile} />
+      <OpenReportEditorButton />
       <ChatInput mobile={isMobile} />
       <ReportEditorController />
       <ChatHydration />
