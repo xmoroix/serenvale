@@ -2,7 +2,7 @@ import { DynamicLayoutProps } from '@/types/next';
 import { RouteVariants } from '@/utils/server/routeVariants';
 
 import RadiologyBanner from '../../features/RadiologyBanner';
-import ReportEditorModal from '../../features/ReportEditorModal';
+import ReportEditorController from '../../features/ReportEditorController';
 import ChatHydration from './features/ChatHydration';
 import ChatInput from './features/ChatInput';
 import ChatList from './features/ChatList';
@@ -19,7 +19,7 @@ const ChatConversation = async (props: DynamicLayoutProps) => {
       <RadiologyBanner />
       <ChatList mobile={isMobile} />
       <ChatInput mobile={isMobile} />
-      <ReportEditorModal />
+      <ReportEditorController />
       <ChatHydration />
       <ThreadHydration />
       {!isMobile && <ChatMinimap />}
