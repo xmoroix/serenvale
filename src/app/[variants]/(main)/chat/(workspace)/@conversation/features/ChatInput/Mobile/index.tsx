@@ -20,6 +20,7 @@ import { useSend, useSendGroupMessage } from '../useSend';
 
 const leftActions: ActionKeys[] = [
   'fileUpload',
+  'knowledgeBase',
   '---',
   ['stt', 'clear'],
   'mainToken',

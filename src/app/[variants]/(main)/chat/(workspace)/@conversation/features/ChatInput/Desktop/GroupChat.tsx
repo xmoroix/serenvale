@@ -21,12 +21,13 @@ import { useSendMenuItems } from './useSendMenuItems';
 
 const leftActions: ActionKeys[] = [
   'fileUpload',
+  'knowledgeBase',
   '---',
   ['stt', 'clear'],
   'groupChatToken',
 ];
 
-const dmLeftActions: ActionKeys[] = ['fileUpload', '---', ['stt']];
+const dmLeftActions: ActionKeys[] = ['fileUpload', 'knowledgeBase', '---', ['stt']];
 
 const rightActions: ActionKeys[] = ['saveTopic'];
 

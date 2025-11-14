@@ -16,6 +16,7 @@ import { useSendMenuItems } from './useSendMenuItems';
 
 const leftActions: ActionKeys[] = [
   'fileUpload',
+  'knowledgeBase',
   '---',
   ['stt', 'clear'],
   'mainToken',
