@@ -1,9 +1,11 @@
 'use client';
 
 import { App, Button, Modal, Space, Tag } from 'antd';
-import { FileText, Printer, Send, Save } from 'lucide-react';
+import { FileText, Printer, Send, Save, Check } from 'lucide-react';
 import { useState } from 'react';
 import { Flexbox } from 'react-layout-kit';
+
+import { lambdaQuery } from '@/libs/trpc/client';
 
 interface ReportData {
   aiContent: string;
@@ -26,6 +28,7 @@ interface ReportData {
     studyDescription?: string;
   };
   reportId?: string;
+  studyId?: string;
   status?: 'draft' | 'final' | 'signed' | 'sent';
 }
 
@@ -103,24 +106,130 @@ const ReportEditorModal = ({
   };
 
   const [content, setContent] = useState(assembleReport());
+  const [currentReportId, setCurrentReportId] = useState(report.reportId);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = () => {
-    if (onSave) {
-      onSave(content);
-      message.success('Report saved as draft');
-    } else {
-      // TODO: Implement database save
-      message.info('Save functionality (implementation pending)');
+  const createReportMutation = lambdaQuery.report.createReport.useMutation();
+  const updateReportMutation = lambdaQuery.report.updateReport.useMutation();
+  const signReportMutation = lambdaQuery.report.signReport.useMutation();
+
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+
+      if (onSave) {
+        onSave(content);
+        message.success('Report saved as draft');
+      } else {
+        // Create or update the report
+        if (currentReportId) {
+          // Update existing report
+          await updateReportMutation.mutateAsync({
+            id: currentReportId,
+            value: {
+              content,
+              status: 'draft',
+            },
+          });
+          message.success('Report updated as draft');
+        } else {
+          // Create new report
+          const reportId = await createReportMutation.mutateAsync({
+            studyId: report.studyId || null,
+            content,
+            status: 'draft',
+            metadata: {
+              patientName: report.patientInfo.name,
+              patientId: report.patientInfo.id,
+              modality: report.patientInfo.modality,
+              studyDate: report.patientInfo.date,
+              studyDescription: report.patientInfo.studyDescription,
+              accessionNumber: report.patientInfo.accessionNumber,
+            },
+          });
+          setCurrentReportId(reportId);
+          message.success('Report saved as draft');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to save report:', error);
+      message.error('Failed to save report');
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  const handleFinalize = () => {
-    if (onFinalize) {
-      onFinalize(content);
-      message.success('Report finalized');
+  const handleFinalize = async () => {
+    try {
+      setIsSaving(true);
+
+      if (onFinalize) {
+        onFinalize(content);
+        message.success('Report finalized');
+        onClose();
+      } else {
+        // Create or update the report with final status
+        if (currentReportId) {
+          await updateReportMutation.mutateAsync({
+            id: currentReportId,
+            value: {
+              content,
+              status: 'final',
+            },
+          });
+          message.success('Report finalized');
+        } else {
+          const reportId = await createReportMutation.mutateAsync({
+            studyId: report.studyId || null,
+            content,
+            status: 'final',
+            metadata: {
+              patientName: report.patientInfo.name,
+              patientId: report.patientInfo.id,
+              modality: report.patientInfo.modality,
+              studyDate: report.patientInfo.date,
+              studyDescription: report.patientInfo.studyDescription,
+              accessionNumber: report.patientInfo.accessionNumber,
+            },
+          });
+          setCurrentReportId(reportId);
+          message.success('Report finalized');
+        }
+        onClose();
+      }
+    } catch (error) {
+      console.error('Failed to finalize report:', error);
+      message.error('Failed to finalize report');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSign = async () => {
+    try {
+      setIsSaving(true);
+
+      if (!currentReportId) {
+        message.error('Please save the report before signing');
+        return;
+      }
+
+      // Must be finalized before signing
+      if (report.status === 'draft') {
+        message.warning('Please finalize the report before signing');
+        return;
+      }
+
+      await signReportMutation.mutateAsync({ id: currentReportId });
+      message.success('Report signed successfully');
+      // Update local status
+      report.status = 'signed';
       onClose();
-    } else {
-      message.info('Finalize functionality (implementation pending)');
+    } catch (error) {
+      console.error('Failed to sign report:', error);
+      message.error('Failed to sign report');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -128,12 +237,75 @@ const ReportEditorModal = ({
     if (onPrint) {
       onPrint(content);
     } else {
-      // TODO: Implement print
-      message.info('Print functionality (implementation pending)');
+      // Generate print preview
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Radiology Report - ${report.patientInfo.name}</title>
+              <style>
+                body {
+                  font-family: 'Times New Roman', serif;
+                  margin: 2cm;
+                  line-height: 1.6;
+                }
+                h1 {
+                  text-align: center;
+                  font-size: 18pt;
+                  margin-bottom: 20px;
+                }
+                .header {
+                  border-bottom: 2px solid #000;
+                  padding-bottom: 10px;
+                  margin-bottom: 20px;
+                }
+                .patient-info {
+                  margin-bottom: 20px;
+                }
+                .content {
+                  white-space: pre-wrap;
+                  margin: 20px 0;
+                }
+                .footer {
+                  margin-top: 40px;
+                  border-top: 1px solid #000;
+                  padding-top: 10px;
+                }
+                @media print {
+                  body { margin: 1cm; }
+                }
+              </style>
+            </head>
+            <body>
+              <div class="header">
+                <h1>RADIOLOGY REPORT</h1>
+              </div>
+              <div class="patient-info">
+                <p><strong>Patient:</strong> ${report.patientInfo.name} (ID: ${report.patientInfo.id})</p>
+                <p><strong>Study Date:</strong> ${report.patientInfo.date}</p>
+                <p><strong>Modality:</strong> ${report.patientInfo.modality}</p>
+                ${report.patientInfo.studyDescription ? `<p><strong>Study:</strong> ${report.patientInfo.studyDescription}</p>` : ''}
+                ${report.patientInfo.accessionNumber ? `<p><strong>Accession #:</strong> ${report.patientInfo.accessionNumber}</p>` : ''}
+              </div>
+              <div class="content">${content.replace(/\n/g, '<br>')}</div>
+              <div class="footer">
+                <p><strong>Status:</strong> ${report.status?.toUpperCase() || 'DRAFT'}</p>
+                <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+              </div>
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+      } else {
+        message.error('Could not open print window. Please check your popup blocker.');
+      }
     }
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (report.status !== 'signed' && report.status !== 'final') {
       message.warning('Report must be finalized and signed before sending to PACS');
       return;
@@ -143,7 +315,30 @@ const ReportEditorModal = ({
       onSend(content);
       message.success('Report sent to PACS');
     } else {
-      message.info('Send to PACS (implementation pending)');
+      // TODO: Implement C-STORE to PACS
+      try {
+        setIsSaving(true);
+
+        if (!currentReportId) {
+          message.error('Please save the report before sending to PACS');
+          return;
+        }
+
+        // For now, just show a message
+        // In production, this would:
+        // 1. Generate PDF of the report
+        // 2. Use C-STORE to send PDF as DICOM SR to PACS
+        // 3. Update report status to 'sent'
+        message.info('Send to PACS (C-STORE implementation pending)');
+
+        // When implemented, call:
+        // await lambdaQuery.report.markReportAsSent.mutateAsync({ id: currentReportId });
+      } catch (error) {
+        console.error('Failed to send to PACS:', error);
+        message.error('Failed to send report to PACS');
+      } finally {
+        setIsSaving(false);
+      }
     }
   };
 
@@ -151,17 +346,37 @@ const ReportEditorModal = ({
     <Modal
       footer={[
         <Space key="actions">
-          <Button icon={<Save size={16} />} onClick={handleSave}>
+          <Button
+            disabled={isSaving}
+            icon={<Save size={16} />}
+            loading={isSaving}
+            onClick={handleSave}
+          >
             Save Draft
           </Button>
-          <Button icon={<FileText size={16} />} onClick={handleFinalize} type="primary">
+          <Button
+            disabled={isSaving}
+            icon={<FileText size={16} />}
+            loading={isSaving}
+            onClick={handleFinalize}
+            type="primary"
+          >
             Finalize
           </Button>
-          <Button icon={<Printer size={16} />} onClick={handlePrint}>
+          <Button
+            disabled={isSaving || report.status === 'draft' || report.status === 'signed'}
+            icon={<Check size={16} />}
+            loading={isSaving}
+            onClick={handleSign}
+            type={report.status === 'signed' ? 'default' : 'primary'}
+          >
+            {report.status === 'signed' ? 'Signed' : 'Sign Report'}
+          </Button>
+          <Button disabled={isSaving} icon={<Printer size={16} />} onClick={handlePrint}>
             Print
           </Button>
           <Button
-            disabled={report.status !== 'signed' && report.status !== 'final'}
+            disabled={isSaving || (report.status !== 'signed' && report.status !== 'final')}
             icon={<Send size={16} />}
             onClick={handleSend}
           >

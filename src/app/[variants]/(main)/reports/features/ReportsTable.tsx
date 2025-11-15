@@ -5,11 +5,14 @@ import { App, Badge, Button, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { FileText, Printer, Send } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { Flexbox } from 'react-layout-kit';
+
+import { lambdaQuery } from '@/libs/trpc/client';
+import { useReportEditorStore } from '@/store/report';
 
 interface Report {
   accessionNumber?: string;
+  content: string;
   date: string;
   id: string;
   modality: string;
@@ -18,50 +21,32 @@ interface Report {
   priority?: 'STAT' | 'URGENT' | 'ROUTINE';
   status: 'draft' | 'final' | 'signed' | 'sent';
   studyDescription?: string;
+  studyId?: string | null;
 }
-
-// Mock data for demonstration - same structure as worklist
-const mockReports: Report[] = [
-  {
-    id: 'rpt_001',
-    patientName: 'John Doe',
-    patientId: 'P123456',
-    date: '2024-11-13',
-    modality: 'CT',
-    studyDescription: 'CT Chest without contrast',
-    priority: 'STAT',
-    status: 'signed',
-    accessionNumber: 'ACC001',
-  },
-  {
-    id: 'rpt_002',
-    patientName: 'Jane Smith',
-    patientId: 'P789012',
-    date: '2024-11-13',
-    modality: 'MR',
-    studyDescription: 'MR Brain',
-    priority: 'ROUTINE',
-    status: 'draft',
-    accessionNumber: 'ACC002',
-  },
-  {
-    id: 'rpt_003',
-    patientName: 'Bob Johnson',
-    patientId: 'P345678',
-    date: '2024-11-12',
-    modality: 'CR',
-    studyDescription: 'Chest X-ray',
-    priority: 'ROUTINE',
-    status: 'sent',
-    accessionNumber: 'ACC003',
-  },
-];
 
 const ReportsTable = () => {
   const router = useRouter();
   const { message } = App.useApp();
-  const [reports, setReports] = useState<Report[]>(mockReports);
-  const [loading, setLoading] = useState(false);
+  const openEditor = useReportEditorStore((s) => s.openEditor);
+
+  // Fetch reports from database
+  const { data: dbReports, isLoading } = lambdaQuery.report.getReports.useQuery();
+
+  // Map database reports to table format
+  const reports: Report[] =
+    dbReports?.map((report) => ({
+      id: report.id,
+      patientName: report.metadata?.patientName || 'Unknown Patient',
+      patientId: report.metadata?.patientId || '',
+      date: report.metadata?.studyDate || new Date(report.createdAt).toISOString().split('T')[0],
+      modality: report.metadata?.modality || '',
+      studyDescription: report.metadata?.studyDescription || '',
+      priority: report.metadata?.priority,
+      status: report.status,
+      accessionNumber: report.metadata?.accessionNumber || '',
+      studyId: report.studyId,
+      content: report.content,
+    })) || [];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -79,19 +64,20 @@ const ReportsTable = () => {
   };
 
   const handleEdit = (report: Report) => {
-    // Navigate to /chat with existing report for editing
-    const params = new URLSearchParams({
+    openEditor({
       reportId: report.id,
-      patientName: report.patientName,
-      patientId: report.patientId,
-      modality: report.modality,
-      studyDate: report.date,
-      studyDescription: report.studyDescription || '',
-      accessionNumber: report.accessionNumber || '',
-      mode: 'radiology-report',
-      edit: 'true',
+      studyId: report.studyId,
+      aiContent: report.content,
+      patientInfo: {
+        id: report.patientId,
+        name: report.patientName,
+        date: report.date,
+        modality: report.modality,
+        studyDescription: report.studyDescription,
+        accessionNumber: report.accessionNumber,
+      },
+      status: report.status as 'draft' | 'final',
     });
-    router.push(`/chat?${params.toString()}`);
   };
 
   const handlePrint = (report: Report) => {
@@ -209,7 +195,7 @@ const ReportsTable = () => {
         <Table
           columns={columns}
           dataSource={reports}
-          loading={loading}
+          loading={isLoading}
           pagination={{ pageSize: 20 }}
           rowKey="id"
           scroll={{ x: 1000 }}

@@ -4,6 +4,8 @@ import { useResponsive, useTheme } from 'antd-style';
 import { memo } from 'react';
 import { Flexbox } from 'react-layout-kit';
 
+import ReportEditorController from '@/app/[variants]/(main)/chat/features/ReportEditorController';
+
 import FilterPanel from '../../features/FilterPanel';
 import ReportsTable from '../../features/ReportsTable';
 
@@ -17,10 +19,13 @@ const Desktop = memo(() => {
       style={{ background: theme.colorBgContainer, position: 'relative' }}
       width={'100%'}
     >
-      <Flexbox gap={24} padding={24} style={{ maxWidth: 1400, width: '100%' }}>
+      <Flexbox gap={24} padding={24} style={{ width: '100%' }}>
         <FilterPanel />
         <ReportsTable />
       </Flexbox>
+
+      {/* Report Editor Modal */}
+      <ReportEditorController />
     </Flexbox>
   );
 });
