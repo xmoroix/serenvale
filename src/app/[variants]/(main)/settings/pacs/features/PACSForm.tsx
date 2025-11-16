@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
 
-import { trpc } from '@/libs/trpc';
+import { lambdaQuery } from '@/libs/trpc/client';
 
 interface PACSSettings {
   aeTitle: string;
@@ -26,7 +26,7 @@ const PACSForm = () => {
   const [clinicId, setClinicId] = useState<string | null>(null);
 
   // Load clinic config on mount
-  const { data: clinicConfig, isLoading } = trpc.clinicConfig.getOrCreateConfig.useQuery();
+  const { data: clinicConfig, isLoading } = lambdaQuery.clinicConfig.getOrCreateConfig.useQuery();
 
   // Set form values when config loads
   useEffect(() => {
@@ -39,7 +39,7 @@ const PACSForm = () => {
   }, [clinicConfig, form]);
 
   // Mutation for updating PACS config
-  const updatePacsMutation = trpc.clinicConfig.updatePacsConfig.useMutation();
+  const updatePacsMutation = lambdaQuery.clinicConfig.updatePacsConfig.useMutation();
 
   const handleSave = async () => {
     try {
